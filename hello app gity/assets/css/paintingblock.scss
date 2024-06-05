@@ -1,0 +1,130 @@
+
+      
+// 
+// #paintingblock *{
+//   margin: 0;
+//   padding: 0;
+// }
+    
+    
+#paintingblock {
+  position: relative;
+  display: flex;
+  
+  margin-bottom: 20px;
+  // background: green;
+  canvas{
+    // height: 500px;
+    // width: 500px;
+    background-color: #ffffae;
+  }
+  
+  canvas:focus{
+    outline: none;
+  }
+  
+
+  #buttons {
+    // position: absolute;
+    // top: 0px;
+    // z-index: 1;
+    // left:0;
+    
+    // width: 100%;
+    // height: 35px;
+    // padding: 20px 0 0 20px;
+    
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start; 
+    align-content: stretch;
+    align-items: flex-start;
+    
+    // padding-bottom: 40px;
+    margin-bottom: 2px;
+  }
+
+  #buttons button {
+    order: 0;
+    flex: 0 1 auto;
+    align-self: auto;
+    margin: 0 4px;
+    // font-size: 20px;
+    // width: 32px;
+    // height: 32px;
+    padding: 4px 10px;
+    background-color: #aaffee;
+    border-radius: 4px;
+    margin-bottom: 4px;
+    // background-color: green;
+  }
+
+
+  #images{
+    width: 400px;
+    border: solid 1px #0080001a;
+    // position: absolute;
+    // left: 750px;
+    margin-left: 14px;
+  }
+  
+  // #images img{
+  //   display: inline-block;
+  //   width:100px;
+  //   image-rendering: pixelated;
+  //   image-rendering: crisp-edges;
+  // }
+
+  #images {
+    .item{
+      // border: solid 2px orange;
+      display: inline-block;
+      position: relative;
+      width:100px;
+      cursor:pointer;
+      
+      img{
+        // display: inline-block;
+        width:100px;
+        // width:auto;
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+        z-index: 0;
+      }
+      .delete-button.on{
+        display: inline-block;
+      }
+      .delete-button{
+        display: none;
+        width: 30px;
+        height: 30px;
+        position: absolute;
+        bottom:0;
+        right: 0;
+        z-index: 1;
+        // background-color: blue;
+      }
+      .delete-button {
+      	background-color:#daf700;
+      	border-radius:29px;
+      	// display:inline-block;
+      	cursor:pointer;
+      	color:#000000;
+      	font-family:Verdana;
+      	font-size:14px;
+      	padding:11px 11px;
+        line-height: 0;
+      	text-decoration:none;
+      }
+      .delete-button:hover {
+      	background-color:#66c930;
+      }
+      .delete-button:active {
+      	// position:relative;
+      	// top:1px;
+      }
+    }
+  }
+      
+}

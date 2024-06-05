@@ -1,0 +1,244 @@
+
+<meta name="csrf-token" content="{ Plug.CSRFProtection.get_csrf_token() }">
+
+
+
+<!-- note, ai gave some javascript at the bottom of the page to load the images from database -->
+<div id="paintingblock">
+  
+  <div id="painting-area">
+    <div id="buttons">
+      <!--<input id="letterinput" type="text" />-->
+      <button id="clearbutton" value="??">clear</button>
+      <!--
+      <button id="savebutton" value="??" phx-hook="AppyHook">save</button>
+      <button id="iterrateSaveButton" value="??" phx-hook="AppyHook">iterate</button>
+      -->
+      <!-- save is clearing and reloading the view so lets just iterrate for now -->
+      <button id="iterrateSaveButton" value="??" phx-hook="SaveButtonHook">save</button>
+      <button id="downloadButton" value="??">dowload</button>
+      <button id="dataDownloadButton" value="??">data dl</button>
+    </div>
+    
+    <canvas id="paintingcanvas" width="400" height="400"></canvas>
+  </div>
+  <div id="images"></div>
+  <!--
+  <div id="images" phx-hook="LoadPaintItems" data-paintitems={ Jason.encode!(@streams.paintitems) }>?</div>
+  -->
+  
+</div>
+
+
+<.header>
+  Listing Paintings
+  <:actions>
+  
+  
+  <.button id="create-painting-btn">Create Painting</.button>
+
+    <.link href={~p"/paintings/fast_add"}>
+      <.button>fast add!!</.button>
+    </.link>
+
+    <.link href={~p"/paintings/new"}>
+      <.button>New Painting</.button>
+    </.link>
+    <.link href={~p"/paintings/delete_all"} method="delete_all"><.button>DeleteAlll</.button></.link>
+  </:actions>
+</.header>
+
+<!-- hate this technique to load the data and parse it later -->
+<div style="display:none;" id="inlinedatadiv" data-paintings={Jason.encode!(@paintings)}>???</div>
+
+<.table id="paintings" rows={@paintings} row_click={&JS.navigate(~p"/paintings/#{&1}")}>
+  <:col :let={painting} label="Name"><%= painting.name %></:col>
+  <:col :let={painting} label="Dataarray"><%= painting.dataarray %></:col>
+  <:action :let={painting}>
+    <div class="sr-only">
+      <.link navigate={~p"/paintings/#{painting}"}>Show</.link>
+    </div>
+    <.link navigate={~p"/paintings/#{painting}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={painting}>
+    <.link href={~p"/paintings/#{painting}"} method="delete" dfgdfgdata-confirm="Are you sure?">
+      Delete
+    </.link>
+  </:action>
+</.table>
+
+
+<script>
+
+  // Embedding the painting data in a script tag
+
+  // need to wait till window.paintAppA is ready
+  document.addEventListener("DOMContentLoaded", (event) => {
+
+    const inlinedata = document.getElementById("inlinedatadiv");
+    // console.log("inlinedata", inlinedata);
+
+    if (inlinedata) {
+
+      const gg = JSON.parse(inlinedata.dataset.paintings);
+      gg.forEach((item, i) => {
+
+        let _dats = JSON.parse(item.dataarray);
+        const img = window.paintAppA.generateDataImageFromDatabase(_dats);
+        if(img){
+          const yy2 = document.getElementById('images');
+          let wrap = document.createElement("div");
+          let button = document.createElement("button");
+          
+          wrap.classList.add("item");
+          wrap.appendChild(img);
+          
+          button.classList.add("delete-button");
+          // button.classList.add("off");
+          button.innerText = "x";
+          wrap.appendChild(button);
+          
+          yy2.appendChild(wrap);
+
+          wrap.addEventListener('mouseenter', () => {
+              button.classList.add('on');
+          });
+
+          wrap.addEventListener('mouseleave', () => {
+              button.classList.remove('on');
+          });
+          let paintingId = item.id;
+          button.addEventListener('click', (ev) => {
+            // debugger
+            // const paintingId = item.id; // Assuming each item has an id field
+            fetch(`/paintings/${paintingId}`, {
+              method: 'DELETE',
+              headers: {
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+              }
+            })
+            .then(response => {
+              if (response.ok) {
+                wrap.remove();
+              } else {
+                return response.json().then(data => {
+                  alert('Error deleting painting: ' + data.error);
+                });
+              }
+            })
+            // .catch(error => {
+            //   console.error('Fetch error:', error);
+            //   alert('Error deleting painting');
+            // });
+          });
+
+          // ----
+            
+          
+        }
+        // console.log("item",item);
+      });
+    
+    }
+  });
+
+  document.getElementById('iterrateSaveButton').addEventListener('click', function() {
+
+    var dataA = window.paintAppA.exportData(true)
+    
+    // console.log("dataA", dataA);
+    const paintingData = {name:"neat111", dataarray:dataA};
+    
+    fetch('/paintings', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+      },
+      body: JSON.stringify({ painting: paintingData })
+    })
+    .then(response => {
+      if (response.ok) {
+        window.location.reload();
+      } else {
+        alert('Error creating painting');
+      }
+    });
+    
+  });
+
+
+  // console.log("paintingsData", paintingsData);
+  
+  document.getElementById('create-painting-btn').addEventListener('click', function() {
+    const paintingData = {
+      name: "namey",
+      dataarray: "1234455"
+    };
+
+    fetch('/paintings', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+      },
+      body: JSON.stringify({ painting: paintingData })
+    })
+    .then(response => {
+      if (response.ok) {
+        window.location.reload();
+      } else {
+        alert('Error creating painting');
+      }
+    });
+    // .then(response => response.json())
+    // .then((response) => {
+    //   // debugger
+    //   console.log("¿¿¿¿", response);
+    //   return response.json()
+    // })
+    // .catch(console.error)
+    // .then(data => {
+    //   console.log("0000a", data);
+    //   // debugger
+    //   // if (data.status === 'ok') {
+    //   // console.log("aaaa");
+    //   //   reloadPaintingTable();
+    //   //   const newPainting = document.createElement('div');
+    //   //   newPainting.id = `painting-${data.painting.id}`;
+    //   //   newPainting.innerHTML = `<p>${data.painting.name}</p>`;
+    //   //   document.body.appendChild(newPainting);
+    //   // } 
+    //   // else {
+    //   //   console.log("bbbb", data);
+    //   //   // alert('Error creating painting');
+    //   // }
+    // })
+    // .catch(console.error);
+  });
+  
+    // the fetch does not reach this function for now
+  // function reloadPaintingTable() {
+  //   console.log("1111");
+  //   fetch('/paintings', {
+  //     method: 'GET',
+  //     headers: {
+  //       'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+  //     }
+  //   })
+  //   .then((response) => response.json())
+  //   .then(data => {
+  //     console.log("2222");
+  //     const paintingTable = document.getElementById('paintings');
+  //     paintingTable.innerHTML = '';
+  //     data.paintings.forEach(painting => {
+  //       const paintingDiv = document.createElement('div');
+  //       paintingDiv.id = `painting-${painting.id}`;
+  //       paintingDiv.innerHTML = `<p>${painting.name}</p>`;
+  //       paintingTable.appendChild(paintingDiv);
+  //       console.log("3333b");
+  //     });
+  //   });
+  // }
+  
+</script>

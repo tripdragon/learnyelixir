@@ -1,0 +1,8 @@
+<.header>
+  Edit Painting <%= @painting.id %>
+  <:subtitle>Use this form to manage painting records in your database.</:subtitle>
+</.header>
+
+<.painting_form changeset={@changeset} action={~p"/paintings/#{@painting}"} />
+
+<.back navigate={~p"/paintings"}>Back to paintings</.back>
